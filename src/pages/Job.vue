@@ -12,16 +12,22 @@ import loader from '@/components/partials/loader.vue';
         data(){
           return{
             jobs:[],
-            isLoading: true
+            isLoading: true,
+            paginatorData:{
+              current_page:1,
+              links:[]
+            }
           }
         },
         methods:{
-          getApi(){
-            axios.get(store.apiUrl).then(result=>{
+          getApi(apiUrl){
+            axios.get(apiUrl).then(result=>{
               
               this.jobs = result.data.jobs.data;
               this.isLoading = false;
-              console.log( this.jobs);
+              this.paginatorData.current_page = result.data.jobs.current_page;
+              this.paginatorData.links = result.data.jobs.links;
+              console.log( this.paginatorData);
               
               
               
@@ -33,7 +39,7 @@ import loader from '@/components/partials/loader.vue';
           }
         },
         mounted(){
-          this.getApi()
+          this.getApi(store.apiUrl)
         }
     }
 </script>
@@ -51,6 +57,17 @@ import loader from '@/components/partials/loader.vue';
           {{ job.title }}
         </li>
        </ul>
+       <div class="paginator">
+        
+        <button
+          v-for="(link, index) in paginatorData.links"
+          :key="index"
+          v-html="link.label"
+          :disabled="link.active || !link.url"
+          @click="getApi(link.url)"
+          ></button>
+        
+       </div>
     </div>
 </template>
 
@@ -61,5 +78,21 @@ import loader from '@/components/partials/loader.vue';
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .paginator{
+    display: flex;
+    justify-content: center;
+    margin: 10px 3px 0 10px;
+    button{
+      background-color: white;
+      padding: 3px;
+      margin: 10px 3px 0px;
+      border-radius: 10px;
+      &:hover{
+        color: violet;
+        cursor: pointer;
+      }
+    }
   }
 </style>
