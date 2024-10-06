@@ -1,6 +1,40 @@
 <script>
+import { store } from '../store/store';
+import axios from 'axios';
+import loader from '@/components/partials/loader.vue';
+
     export default {
-        name: 'Job'
+      name:'Job',
+      components:{
+        loader
+      },
+        
+        data(){
+          return{
+            jobs:[],
+            isLoading: true
+          }
+        },
+        methods:{
+          getApi(){
+            axios.get(store.apiUrl).then(result=>{
+              
+              this.jobs = result.data.jobs.data;
+              this.isLoading = false;
+              console.log( this.jobs);
+              
+              
+              
+              
+            }).catch(error=>{
+              console.log(error.message);
+              
+            })
+          }
+        },
+        mounted(){
+          this.getApi()
+        }
     }
 </script>
 
@@ -8,15 +42,24 @@
 <template>
     <div>
         <h1>I miei progetti</h1>
-        <p>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos, corporis. Sed labore officiis in placeat sequi cum eius ex odio quas, eum tempora repudiandae aliquid!</p>
+        <div v-if="isLoading" class="loading">
+         <loader/>
+
+        </div>
+       <ul v-else>
+        <li v-for="job in jobs" :key="job.id">
+          {{ job.title }}
+        </li>
+       </ul>
     </div>
 </template>
 
 
 
 <style lang="scss" scoped>
-  p{
-    margin: 10px 0;
+  .loading{
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 </style>
